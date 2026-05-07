@@ -12,7 +12,8 @@ export default function App() {
     setView('loading')
     setError(null)
     try {
-      const response = await axios.post('/api/estimate', answers)
+      const base = import.meta.env.VITE_API_URL || ''
+      const response = await axios.post(`${base}/api/estimate`, answers)
       setResult(response.data)
       setView('result')
     } catch (err) {
