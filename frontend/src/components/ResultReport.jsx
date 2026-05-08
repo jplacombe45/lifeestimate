@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
+import { getTranslations } from '../lib/i18n.js'
 
-function ImpactBar({ impact }) {
+function ImpactBar({ impact, yrs }) {
   const maxImpact = 7
   const absImpact = Math.abs(impact)
   const widthPercent = (absImpact / maxImpact) * 100
@@ -22,13 +23,13 @@ function ImpactBar({ impact }) {
           isNeutral ? 'neutral' : isPositive ? 'positive' : 'negative'
         }`}
       >
-        {isNeutral ? '±0' : isPositive ? `+${impact}` : `${impact}`} yrs
+        {isNeutral ? '±0' : isPositive ? `+${impact}` : `${impact}`} {yrs}
       </span>
     </div>
   )
 }
 
-function FactorCard({ factor, index }) {
+function FactorCard({ factor, index, yrs }) {
   const isPositive = factor.impact > 0
   const isNeutral = factor.impact === 0
 
@@ -46,17 +47,19 @@ function FactorCard({ factor, index }) {
             isNeutral ? 'neutral' : isPositive ? 'positive' : 'negative'
           }`}
         >
-          {isNeutral ? '±0' : isPositive ? `+${factor.impact}` : `${factor.impact}`} yrs
+          {isNeutral ? '±0' : isPositive ? `+${factor.impact}` : `${factor.impact}`} {yrs}
         </span>
       </div>
-      <ImpactBar impact={factor.impact} />
+      <ImpactBar impact={factor.impact} yrs={yrs} />
       <p className="factor-description">{factor.description}</p>
     </div>
   )
 }
 
-export default function ResultReport({ result, onStartOver }) {
+export default function ResultReport({ result, onStartOver, lang = 'en' }) {
   const { estimated_age, base_age, country_name, factors, summary, recommendations } = result
+  const t = getTranslations(lang)
+  const ui = t.ui
 
   const totalAdjustment = estimated_age - base_age
   const isAboveAverage = totalAdjustment > 0
@@ -72,7 +75,6 @@ export default function ResultReport({ result, onStartOver }) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
 
-  // Animated counter for the main age number
   useEffect(() => {
     const el = ageRef.current
     if (!el) return
@@ -97,21 +99,22 @@ export default function ResultReport({ result, onStartOver }) {
       {/* Hero section */}
       <div className="report-hero">
         <div className="report-hero-inner">
-          <p className="report-hero-label">Your estimated life expectancy</p>
+          <p className="report-hero-label">{ui.heroLabel}</p>
           <div className="report-age-display">
             <span className="report-age-number" ref={ageRef}>
               {base_age}
             </span>
-            <span className="report-age-unit">years</span>
+            <span className="report-age-unit">{ui.years}</span>
           </div>
           <div
             className={`report-vs-average ${
               isAboveAverage ? 'positive' : isBelowAverage ? 'negative' : 'neutral'
             }`}
           >
-            {isAboveAverage && `+${totalAdjustment.toFixed(1)} years above`}
-            {isBelowAverage && `${totalAdjustment.toFixed(1)} years below`}
-            {!isAboveAverage && !isBelowAverage && 'At'} the {country_name} average of {base_age} years
+            {isAboveAverage && ui.aboveAverage(totalAdjustment.toFixed(1))}
+            {isBelowAverage && ui.belowAverage(totalAdjustment.toFixed(1))}
+            {!isAboveAverage && !isBelowAverage && ui.atAverage}{' '}
+            {ui.averageSuffix(country_name, base_age)}
           </div>
           <p className="report-summary">{summary}</p>
         </div>
@@ -119,23 +122,23 @@ export default function ResultReport({ result, onStartOver }) {
         <div className="report-stats-row">
           <div className="report-stat">
             <span className="report-stat-value positive">
-              +{positiveFactors.reduce((s, f) => s + f.impact, 0)} yrs
+              +{positiveFactors.reduce((s, f) => s + f.impact, 0)} {ui.yrs}
             </span>
-            <span className="report-stat-label">From positive factors</span>
+            <span className="report-stat-label">{ui.fromPositive}</span>
           </div>
           <div className="report-stat-divider" />
           <div className="report-stat">
             <span className="report-stat-value negative">
-              {negativeFactors.reduce((s, f) => s + f.impact, 0)} yrs
+              {negativeFactors.reduce((s, f) => s + f.impact, 0)} {ui.yrs}
             </span>
-            <span className="report-stat-label">From risk factors</span>
+            <span className="report-stat-label">{ui.fromRisk}</span>
           </div>
           <div className="report-stat-divider" />
           <div className="report-stat">
             <span className="report-stat-value neutral">
-              {totalAdjustment > 0 ? '+' : ''}{totalAdjustment.toFixed(1)} yrs
+              {totalAdjustment > 0 ? '+' : ''}{totalAdjustment.toFixed(1)} {ui.yrs}
             </span>
-            <span className="report-stat-label">Net adjustment</span>
+            <span className="report-stat-label">{ui.netAdjustment}</span>
           </div>
         </div>
       </div>
@@ -144,20 +147,18 @@ export default function ResultReport({ result, onStartOver }) {
       <section className="report-section">
         <h2 className="section-title">
           <span className="section-title-icon">📊</span>
-          Lifestyle Factor Breakdown
+          {ui.breakdownTitle}
         </h2>
-        <p className="section-subtitle">
-          Each factor shows how your answers compare to the statistical baseline.
-        </p>
+        <p className="section-subtitle">{ui.breakdownSubtitle}</p>
 
         {positiveFactors.length > 0 && (
           <div className="factors-group">
             <h3 className="factors-group-label positive">
-              <span>✓</span> Positive factors ({positiveFactors.length})
+              <span>✓</span> {ui.positiveFactors(positiveFactors.length)}
             </h3>
             <div className="factors-grid">
               {positiveFactors.map((factor, i) => (
-                <FactorCard key={factor.name} factor={factor} index={i} />
+                <FactorCard key={factor.name} factor={factor} index={i} yrs={ui.yrs} />
               ))}
             </div>
           </div>
@@ -166,11 +167,11 @@ export default function ResultReport({ result, onStartOver }) {
         {negativeFactors.length > 0 && (
           <div className="factors-group">
             <h3 className="factors-group-label negative">
-              <span>↓</span> Areas for improvement ({negativeFactors.length})
+              <span>↓</span> {ui.areasForImprovement(negativeFactors.length)}
             </h3>
             <div className="factors-grid">
               {negativeFactors.map((factor, i) => (
-                <FactorCard key={factor.name} factor={factor} index={i} />
+                <FactorCard key={factor.name} factor={factor} index={i} yrs={ui.yrs} />
               ))}
             </div>
           </div>
@@ -179,11 +180,11 @@ export default function ResultReport({ result, onStartOver }) {
         {neutralFactors.length > 0 && (
           <div className="factors-group">
             <h3 className="factors-group-label neutral">
-              <span>—</span> Neutral factors ({neutralFactors.length})
+              <span>—</span> {ui.neutralFactors(neutralFactors.length)}
             </h3>
             <div className="factors-grid">
               {neutralFactors.map((factor, i) => (
-                <FactorCard key={factor.name} factor={factor} index={i} />
+                <FactorCard key={factor.name} factor={factor} index={i} yrs={ui.yrs} />
               ))}
             </div>
           </div>
@@ -194,11 +195,9 @@ export default function ResultReport({ result, onStartOver }) {
       <section className="report-section">
         <h2 className="section-title">
           <span className="section-title-icon">💡</span>
-          Personalized Recommendations
+          {ui.recsTitle}
         </h2>
-        <p className="section-subtitle">
-          Evidence-based actions you can take to improve your longevity.
-        </p>
+        <p className="section-subtitle">{ui.recsSubtitle}</p>
         <div className="recommendations-list">
           {recommendations.map((rec, i) => (
             <div key={i} className="recommendation-item">
@@ -212,23 +211,18 @@ export default function ResultReport({ result, onStartOver }) {
       {/* CTA */}
       <div className="report-cta">
         <div className="report-cta-inner">
-          <h3 className="cta-title">Want to see how your habits could change things?</h3>
-          <p className="cta-subtitle">
-            Small lifestyle changes can add meaningful years to your life. Retake
-            the assessment to see the impact.
-          </p>
+          <h3 className="cta-title">{ui.ctaTitle}</h3>
+          <p className="cta-subtitle">{ui.ctaSubtitle}</p>
           <button className="start-over-btn" onClick={onStartOver}>
-            <span>↩</span> Start Over
+            <span>↩</span> {ui.startOver}
           </button>
         </div>
       </div>
 
-      <div className="report-disclaimer">
-        <strong>Disclaimer:</strong> This estimate is based on population-level
-        statistics and general lifestyle research. It is not a medical diagnosis
-        and should not replace professional healthcare advice. Individual outcomes
-        vary significantly based on genetics, environment, and many other factors.
-      </div>
+      <div
+        className="report-disclaimer"
+        dangerouslySetInnerHTML={{ __html: ui.disclaimer }}
+      />
     </div>
   )
 }
