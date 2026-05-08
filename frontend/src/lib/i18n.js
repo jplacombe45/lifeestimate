@@ -38,6 +38,14 @@ const TRANSLATIONS = {
       ctaSubtitle: 'Small lifestyle changes can add meaningful years to your life. Retake the assessment to see the impact.',
       startOver: 'Start Over',
       disclaimer: '<strong>Disclaimer:</strong> This estimate is based on population-level statistics and general lifestyle research. It is not a medical diagnosis and should not replace professional healthcare advice. Individual outcomes vary significantly based on genetics, environment, and many other factors.',
+      bmiInput: {
+        metricLabel:   'Metric',
+        imperialLabel: 'Imperial',
+        weightLabel:   'Weight',
+        heightLabel:   'Height',
+        bmiLabel:      'BMI:',
+        orLabel:       'or select manually',
+      },
     },
     questions: {
       smoking:          { question: 'Do you smoke?',                                      options: { never: 'Never', former: 'Former smoker', current: 'Current smoker' } },
@@ -200,6 +208,14 @@ const TRANSLATIONS = {
       ctaSubtitle: "De petits changements peuvent ajouter des années précieuses à votre vie. Reprenez l'évaluation pour mesurer l'impact.",
       startOver: 'Recommencer',
       disclaimer: "<strong>Avertissement :</strong> Cette estimation est basée sur des statistiques de population et des recherches générales sur le mode de vie. Elle ne constitue pas un diagnostic médical et ne remplace pas l'avis d'un professionnel de santé. Les résultats individuels varient considérablement selon la génétique, l'environnement et d'autres facteurs.",
+      bmiInput: {
+        metricLabel:   'Métrique',
+        imperialLabel: 'Impérial',
+        weightLabel:   'Poids',
+        heightLabel:   'Taille',
+        bmiLabel:      'IMC :',
+        orLabel:       'ou sélectionner manuellement',
+      },
     },
     questions: {
       smoking:          { question: 'Fumez-vous ?',                                                  options: { never: 'Jamais', former: 'Ancien(ne) fumeur(se)', current: 'Fumeur(se) actuel(le)' } },
@@ -362,6 +378,14 @@ const TRANSLATIONS = {
       ctaSubtitle: 'Pequeños cambios pueden añadir años significativos a tu vida. Retoma la evaluación para ver el impacto.',
       startOver: 'Empezar de nuevo',
       disclaimer: '<strong>Aviso:</strong> Esta estimación está basada en estadísticas poblacionales e investigaciones generales sobre el estilo de vida. No es un diagnóstico médico y no debe reemplazar el consejo de un profesional de salud. Los resultados individuales varían significativamente según la genética, el entorno y muchos otros factores.',
+      bmiInput: {
+        metricLabel:   'Métrico',
+        imperialLabel: 'Imperial',
+        weightLabel:   'Peso',
+        heightLabel:   'Altura',
+        bmiLabel:      'IMC:',
+        orLabel:       'o seleccionar manualmente',
+      },
     },
     questions: {
       smoking:          { question: '¿Fumas?',                                                            options: { never: 'Nunca', former: 'Exfumador/a', current: 'Fumador/a actual' } },

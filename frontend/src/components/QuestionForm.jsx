@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { getTranslations } from '../lib/i18n.js'
+import BmiInput from './BmiInput.jsx'
 
 const QUESTION_META = [
   { id: 'smoking',          number: 1,  icon: '🚬' },
@@ -68,6 +69,19 @@ export default function QuestionForm({ onSubmit, lang = 'en' }) {
       <form onSubmit={handleSubmit} noValidate>
         <div className="questions-grid">
           {QUESTION_META.map((q) => {
+            if (q.id === 'bmi') {
+              return (
+                <BmiInput
+                  key="bmi"
+                  number={q.number}
+                  value={answers.bmi}
+                  onChange={(val) => handleSelect('bmi', val)}
+                  t={t}
+                  validationError={validationError}
+                />
+              )
+            }
+
             const qt = t.questions[q.id]
             const optionEntries = Object.entries(qt.options)
             return (
