@@ -5,6 +5,21 @@ import QuestionForm from './components/QuestionForm.jsx'
 import ResultReport from './components/ResultReport.jsx'
 import LanguageSelector from './components/LanguageSelector.jsx'
 
+function LogoIcon() {
+  return (
+    <svg width="34" height="34" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path
+        d="M16 26 C6 20 3.5 15.5 3.5 12 C3.5 8.5 6.5 6 10 6 C12 6 14 7.5 16 9.5 C18 7.5 20 6 22 6 C25.5 6 28.5 8.5 28.5 12 C28.5 15.5 26 20 16 26 Z"
+        stroke="rgba(255,255,255,0.45)" strokeWidth="1.5" strokeLinejoin="round"
+      />
+      <polyline
+        points="4,16 8,16 9.5,19.5 11.5,8.5 13.5,19.5 15,16 16.5,13 17.5,16 28,16"
+        stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
 export default function App() {
   const [view, setView] = useState('form') // 'form' | 'result'
   const [result, setResult] = useState(null)
@@ -36,7 +51,7 @@ export default function App() {
       <header className="app-header">
         <div className="header-inner">
           <div className="header-logo">
-            <span className="logo-icon">♡</span>
+            <LogoIcon />
             <span className="logo-text">{t.ui.logoText}</span>
           </div>
           <p className="header-tagline">{t.ui.tagline}</p>
