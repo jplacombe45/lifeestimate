@@ -51,7 +51,7 @@ export default function App() {
     <div className="app-root">
       <header className="app-header">
         <div className="header-inner">
-          <div className="header-logo">
+          <div className="header-logo" onClick={handleStartOver} style={{ cursor: 'pointer' }}>
             <LogoIcon />
             <span className="logo-text">{t.ui.logoText}</span>
           </div>
