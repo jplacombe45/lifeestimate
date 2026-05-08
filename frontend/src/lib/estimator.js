@@ -1,3 +1,87 @@
+// WHO / World Bank 2023 life expectancy data by country code
+const COUNTRY_DATA = {
+  AF: { name: 'Afghanistan', baseAge: 63 },
+  AL: { name: 'Albania', baseAge: 78 },
+  DZ: { name: 'Algeria', baseAge: 77 },
+  AR: { name: 'Argentina', baseAge: 76 },
+  AU: { name: 'Australia', baseAge: 83 },
+  AT: { name: 'Austria', baseAge: 82 },
+  BE: { name: 'Belgium', baseAge: 82 },
+  BR: { name: 'Brazil', baseAge: 75 },
+  BG: { name: 'Bulgaria', baseAge: 75 },
+  CA: { name: 'Canada', baseAge: 83 },
+  CL: { name: 'Chile', baseAge: 80 },
+  CN: { name: 'China', baseAge: 78 },
+  CO: { name: 'Colombia', baseAge: 77 },
+  HR: { name: 'Croatia', baseAge: 78 },
+  CZ: { name: 'Czech Republic', baseAge: 79 },
+  DK: { name: 'Denmark', baseAge: 81 },
+  EG: { name: 'Egypt', baseAge: 72 },
+  FI: { name: 'Finland', baseAge: 82 },
+  FR: { name: 'France', baseAge: 83 },
+  DE: { name: 'Germany', baseAge: 81 },
+  GR: { name: 'Greece', baseAge: 82 },
+  HK: { name: 'Hong Kong', baseAge: 85 },
+  HU: { name: 'Hungary', baseAge: 76 },
+  IN: { name: 'India', baseAge: 70 },
+  ID: { name: 'Indonesia', baseAge: 72 },
+  IR: { name: 'Iran', baseAge: 77 },
+  IE: { name: 'Ireland', baseAge: 82 },
+  IL: { name: 'Israel', baseAge: 83 },
+  IT: { name: 'Italy', baseAge: 83 },
+  JP: { name: 'Japan', baseAge: 84 },
+  JO: { name: 'Jordan', baseAge: 75 },
+  KZ: { name: 'Kazakhstan', baseAge: 73 },
+  KE: { name: 'Kenya', baseAge: 67 },
+  KR: { name: 'South Korea', baseAge: 83 },
+  LU: { name: 'Luxembourg', baseAge: 82 },
+  MY: { name: 'Malaysia', baseAge: 76 },
+  MX: { name: 'Mexico', baseAge: 75 },
+  MA: { name: 'Morocco', baseAge: 77 },
+  NL: { name: 'Netherlands', baseAge: 82 },
+  NZ: { name: 'New Zealand', baseAge: 82 },
+  NG: { name: 'Nigeria', baseAge: 63 },
+  NO: { name: 'Norway', baseAge: 83 },
+  PK: { name: 'Pakistan', baseAge: 68 },
+  PE: { name: 'Peru', baseAge: 77 },
+  PH: { name: 'Philippines', baseAge: 71 },
+  PL: { name: 'Poland', baseAge: 77 },
+  PT: { name: 'Portugal', baseAge: 81 },
+  RO: { name: 'Romania', baseAge: 75 },
+  RU: { name: 'Russia', baseAge: 73 },
+  SA: { name: 'Saudi Arabia', baseAge: 77 },
+  ZA: { name: 'South Africa', baseAge: 64 },
+  ES: { name: 'Spain', baseAge: 84 },
+  SE: { name: 'Sweden', baseAge: 83 },
+  CH: { name: 'Switzerland', baseAge: 84 },
+  TW: { name: 'Taiwan', baseAge: 81 },
+  TH: { name: 'Thailand', baseAge: 77 },
+  TR: { name: 'Turkey', baseAge: 77 },
+  UA: { name: 'Ukraine', baseAge: 72 },
+  AE: { name: 'United Arab Emirates', baseAge: 79 },
+  GB: { name: 'United Kingdom', baseAge: 82 },
+  US: { name: 'United States', baseAge: 79 },
+  VN: { name: 'Vietnam', baseAge: 75 },
+}
+
+const DEFAULT_COUNTRY = { name: 'United States', baseAge: 79 }
+
+export function getCountryInfo(code) {
+  return COUNTRY_DATA[code] || DEFAULT_COUNTRY
+}
+
+export async function detectCountry() {
+  try {
+    const controller = new AbortController()
+    setTimeout(() => controller.abort(), 3000)
+    const res = await fetch('https://ipapi.co/json/', { signal: controller.signal })
+    const data = await res.json()
+    return getCountryInfo(data.country_code)
+  } catch {
+    return DEFAULT_COUNTRY
+  }
+}
+
 const BASE_AGE = 79.0
 
 const SCORING = {
@@ -105,7 +189,7 @@ function buildRecommendations(answers) {
   return recs
 }
 
-function buildSummary(estimatedAge, totalAdjustment) {
+function buildSummary(estimatedAge, totalAdjustment, countryName, countryBaseAge) {
   let quality, outlook
   if (totalAdjustment >= 6) {
     quality = 'exceptional'
@@ -127,20 +211,20 @@ function buildSummary(estimatedAge, totalAdjustment) {
     outlook = 'Multiple high-risk factors are substantially reducing your projected life expectancy. Meaningful changes now could add years to your life.'
   }
 
-  const diff = estimatedAge - BASE_AGE
+  const diff = estimatedAge - countryBaseAge
   const comparison =
-    diff > 0 ? `${diff.toFixed(1)} years above the US average` :
-    diff < 0 ? `${Math.abs(diff).toFixed(1)} years below the US average` :
-    'exactly at the US average'
+    diff > 0 ? `${diff.toFixed(1)} years above the ${countryName} average` :
+    diff < 0 ? `${Math.abs(diff).toFixed(1)} years below the ${countryName} average` :
+    `exactly at the ${countryName} average`
 
   return (
     `Based on your lifestyle assessment, your estimated life expectancy is ${estimatedAge.toFixed(1)} years — ` +
-    `${comparison} of ${BASE_AGE} years. ` +
+    `${comparison} of ${countryBaseAge} years. ` +
     `Overall, your lifestyle profile is ${quality}. ${outlook}`
   )
 }
 
-export function estimateLifeExpectancy(answers) {
+export function estimateLifeExpectancy(answers, countryInfo = DEFAULT_COUNTRY) {
   const fieldOrder = ['smoking', 'exercise', 'diet', 'bmi', 'alcohol', 'sleep', 'stress', 'social', 'checkups', 'family_longevity']
   let totalAdjustment = 0
   const factors = []
@@ -151,13 +235,14 @@ export function estimateLifeExpectancy(answers) {
     totalAdjustment += entry.impact
   }
 
-  const estimatedAge = Math.round((BASE_AGE + totalAdjustment) * 10) / 10
+  const estimatedAge = Math.round((countryInfo.baseAge + totalAdjustment) * 10) / 10
 
   return {
     estimated_age: estimatedAge,
-    base_age: BASE_AGE,
+    base_age: countryInfo.baseAge,
+    country_name: countryInfo.name,
     factors,
-    summary: buildSummary(estimatedAge, totalAdjustment),
+    summary: buildSummary(estimatedAge, totalAdjustment, countryInfo.name, countryInfo.baseAge),
     recommendations: buildRecommendations(answers),
   }
 }

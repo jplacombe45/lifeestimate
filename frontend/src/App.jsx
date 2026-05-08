@@ -1,14 +1,19 @@
-import { useState } from 'react'
-import { estimateLifeExpectancy } from './lib/estimator.js'
+import { useState, useEffect } from 'react'
+import { estimateLifeExpectancy, detectCountry } from './lib/estimator.js'
 import QuestionForm from './components/QuestionForm.jsx'
 import ResultReport from './components/ResultReport.jsx'
 
 export default function App() {
   const [view, setView] = useState('form') // 'form' | 'result'
   const [result, setResult] = useState(null)
+  const [countryInfo, setCountryInfo] = useState(null)
+
+  useEffect(() => {
+    detectCountry().then(setCountryInfo)
+  }, [])
 
   function handleSubmit(answers) {
-    const estimate = estimateLifeExpectancy(answers)
+    const estimate = estimateLifeExpectancy(answers, countryInfo)
     setResult(estimate)
     setView('result')
   }

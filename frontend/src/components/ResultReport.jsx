@@ -56,7 +56,7 @@ function FactorCard({ factor, index }) {
 }
 
 export default function ResultReport({ result, onStartOver }) {
-  const { estimated_age, base_age, factors, summary, recommendations } = result
+  const { estimated_age, base_age, country_name, factors, summary, recommendations } = result
 
   const totalAdjustment = estimated_age - base_age
   const isAboveAverage = totalAdjustment > 0
@@ -111,7 +111,7 @@ export default function ResultReport({ result, onStartOver }) {
           >
             {isAboveAverage && `+${totalAdjustment.toFixed(1)} years above`}
             {isBelowAverage && `${totalAdjustment.toFixed(1)} years below`}
-            {!isAboveAverage && !isBelowAverage && 'At'} the US average of {base_age} years
+            {!isAboveAverage && !isBelowAverage && 'At'} the {country_name} average of {base_age} years
           </div>
           <p className="report-summary">{summary}</p>
         </div>
