@@ -3,6 +3,7 @@ import { estimateLifeExpectancy, detectCountry } from './lib/estimator.js'
 import { detectLanguage, getTranslations } from './lib/i18n.js'
 import QuestionForm from './components/QuestionForm.jsx'
 import ResultReport from './components/ResultReport.jsx'
+import ReferencesPage from './components/ReferencesPage.jsx'
 import LanguageSelector from './components/LanguageSelector.jsx'
 
 function LogoIcon() {
@@ -21,7 +22,7 @@ function LogoIcon() {
 }
 
 export default function App() {
-  const [view, setView] = useState('form') // 'form' | 'result'
+  const [view, setView] = useState('form') // 'form' | 'result' | 'references'
   const [result, setResult] = useState(null)
   const [countryInfo, setCountryInfo] = useState(null)
   const [lang, setLang] = useState('en')
@@ -66,10 +67,16 @@ export default function App() {
         {view === 'result' && result && (
           <ResultReport result={result} onStartOver={handleStartOver} lang={lang} />
         )}
+        {view === 'references' && (
+          <ReferencesPage onBack={() => setView(result ? 'result' : 'form')} lang={lang} />
+        )}
       </main>
 
       <footer className="app-footer">
         <p>{t.ui.footer}</p>
+        <button className="refs-footer-link" onClick={() => setView('references')}>
+          {t.ui.refsLink}
+        </button>
       </footer>
     </div>
   )
