@@ -123,7 +123,7 @@ const QUESTIONS = [
   },
 ]
 
-export default function QuestionForm({ onSubmit, serverError }) {
+export default function QuestionForm({ onSubmit }) {
   const [answers, setAnswers] = useState({})
   const [validationError, setValidationError] = useState(false)
 
@@ -212,13 +212,6 @@ export default function QuestionForm({ onSubmit, serverError }) {
             </div>
           ))}
         </div>
-
-        {serverError && (
-          <div className="server-error">
-            <span className="server-error-icon">⚠️</span>
-            {serverError}
-          </div>
-        )}
 
         {validationError && (
           <div className="validation-banner">
